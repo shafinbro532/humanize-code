@@ -178,6 +178,15 @@ class ScannerTests(unittest.TestCase):
             self.assertEqual(scan["summary"]["files"], 1)
             self.assertEqual(scan["files"][0]["path"], "src/ok.py")
 
+    def test_empty_directory_is_mixed_not_human(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            root.mkdir()
+            scan = scan_path(root)
+            self.assertEqual(scan["summary"]["files"], 0)
+            self.assertEqual(scan["summary"]["class"], "mixed")
+            self.assertEqual(scan["summary"]["score"], 50.0)
+
 
 if __name__ == "__main__":
     unittest.main()

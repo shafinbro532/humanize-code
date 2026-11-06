@@ -310,12 +310,18 @@ def scan_path(
 
     files.sort(key=lambda item: (-item["score"], item["path"]))
     total_loc = sum(item["loc"] for item in files)
-    weighted_score = sum(item["score"] * item["loc"] for item in files) / total_loc if total_loc else 0.0
-    weighted_conf = sum(item["confidence"] * item["loc"] for item in files) / total_loc if total_loc else 0.0
+    if total_loc:
+        weighted_score = sum(item["score"] * item["loc"] for item in files) / total_loc
+        weighted_conf = sum(item["confidence"] * item["loc"] for item in files) / total_loc
+    else:
+        weighted_score = 50.0
+        weighted_conf = 0.0
     counts = {"ai-shaped": 0, "mixed": 0, "human-shaped": 0}
     for item in files:
         counts[item["class"]] += 1
-    if weighted_score >= 68:
+    if total_loc == 0:
+        klass = "mixed"
+    elif weighted_score >= 68:
         klass = "ai-shaped"
     elif weighted_score >= 45:
         klass = "mixed"
